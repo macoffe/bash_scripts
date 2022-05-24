@@ -1,0 +1,52 @@
+#!/bin/bash -e  
+
+#bash script allowing user to change the hostname or configuration of an interface.
+#change_hostname and change_interface are lb_init_script functions.
+
+. lib_init_script
+
+ERROR_MSG="Usage : init_script --hostname\n\tinit_script --interface interface --address address --netmask netmask [--gateway gateway]"
+REQUEST=${1}
+
+case ${REQUEST} in
+
+    --hostname)
+        HOSTNAME=${2}
+        [[ -z ${HOSTNAME} ]] && echo -e ${ERROR_MSG} && exit
+        change_hostname ${HOSTNAME}
+    ;;
+
+    --interface)
+        INTERFACE=${2}
+        for (( arg_index=3; arg_index<=$#; arg_index++)); do
+            case ${!arg_index} in
+                --address)
+                    arg_value_index=$((arg_index+1))
+                    ADDRESS=${!arg_value_index}
+                    ((arg_index++))
+                ;;
+                --netmask)
+                    arg_value_index=$((arg_index+1))
+                    NETMASK=${!arg_value_index}
+                    ((arg_index++))
+                ;;
+                --gateway)
+                    arg_value_index=$((arg_index+1))
+                    GATEWAY=${!arg_value_index}
+                    ((arg_index++))
+                ;;
+                *)
+                    echo -e ${ERROR_MSG} && exit
+                ;;
+            esac
+        done
+
+        [[ -z ${INTERFACE} ]] || [[ -z ${ADDRESS} ]] || [[ -z ${NETMASK} ]] && echo -e ${ERROR_MSG} && exit
+		change_interface ${INTERFACE} ${ADDRESS} ${NETMASK} ${GATEWAY}
+        # echo "interface: "${INTERFACE}", address: "${ADDRESS}", netmask: "${NETMASK}", gateway:"${GATEWAY}
+    ;;
+
+  *)
+    echo -e ${ERROR_MSG} && exit
+    ;;
+esac
