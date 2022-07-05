@@ -5,14 +5,15 @@
 
 . lib_init_script
 
-ERROR_MSG="Usage : init_script --hostname\n\tinit_script --interface interface --address address --netmask netmask [--gateway gateway]"
+USAGE_MSG="Usage 1: init_script --hostname hostname\n\nchange hostname\n
+\nUsage 2: init_script --interface interface --address address --netmask netmask [--gateway gateway]\n\nchange interface configuration with provided informations"
 REQUEST=${1}
 
 case ${REQUEST} in
 
     --hostname)
         HOSTNAME=${2}
-        [[ -z ${HOSTNAME} ]] && echo -e ${ERROR_MSG} && exit
+        [[ -z ${HOSTNAME} ]] && echo -e ${USAGE_MSG} && exit
         change_hostname ${HOSTNAME}
     ;;
 
@@ -21,32 +22,35 @@ case ${REQUEST} in
         for (( arg_index=3; arg_index<=$#; arg_index++)); do
             case ${!arg_index} in
                 --address)
+                    [[ ! -z ${ADDRESS} ]] && echo -e ${USAGE_MSG} && exit
                     arg_value_index=$((arg_index+1))
                     ADDRESS=${!arg_value_index}
                     ((arg_index++))
                 ;;
                 --netmask)
+                    [[ ! -z ${NETMASK} ]] && echo -e ${USAGE_MSG} && exit
                     arg_value_index=$((arg_index+1))
                     NETMASK=${!arg_value_index}
                     ((arg_index++))
                 ;;
                 --gateway)
+                    [[ ! -z ${GATEWAY} ]] && echo -e ${USAGE_MSG} && exit
                     arg_value_index=$((arg_index+1))
                     GATEWAY=${!arg_value_index}
                     ((arg_index++))
                 ;;
                 *)
-                    echo -e ${ERROR_MSG} && exit
+                    echo -e ${USAGE_MSG} && exit
                 ;;
             esac
         done
 
-        [[ -z ${INTERFACE} ]] || [[ -z ${ADDRESS} ]] || [[ -z ${NETMASK} ]] && echo -e ${ERROR_MSG} && exit
+        [[ -z ${INTERFACE} ]] || [[ -z ${ADDRESS} ]] || [[ -z ${NETMASK} ]] && echo -e ${USAGE_MSG} && exit
 		change_interface ${INTERFACE} ${ADDRESS} ${NETMASK} ${GATEWAY}
         # echo "interface: "${INTERFACE}", address: "${ADDRESS}", netmask: "${NETMASK}", gateway:"${GATEWAY}
     ;;
 
   *)
-    echo -e ${ERROR_MSG} && exit
+    echo -e ${USAGE_MSG} && exit
     ;;
 esac

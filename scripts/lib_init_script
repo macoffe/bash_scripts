@@ -28,14 +28,14 @@ change_hostname() {
 
 local HOSTNAME=${1};
 
-sudo cat > "/etc/hostname" << EOF
+sudo cat 2> /dev/null > "/etc/hostname" << EOF
 ${HOSTNAME}
 EOF
 
-sudo hostname ${HOSTNAME}
+sudo hostname ${HOSTNAME} 2> /dev/null
 
-sudo sed -i "/127.0.1.1/d" /etc/hosts
-sudo cat >> "/etc/hosts" << EOF
+sudo sed -i "/127.0.1.1/d" /etc/hosts 2> /dev/null
+sudo cat 2> /dev/null >> "/etc/hosts" << EOF
 127.0.1.1   ${HOSTNAME}
 EOF
 
